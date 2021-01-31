@@ -20,7 +20,7 @@ def get_db_client() :
     mesh_db = client[db_name]
     return mesh_db,client  
 
-def export_file_to_db(fname,db,process_num=0): #will enable multiprocessing
+def export_file_to_db(base_name,db,process_num=0): #will enable multiprocessing
 
     # helper logger function 
     def plog(msg) :
@@ -28,15 +28,38 @@ def export_file_to_db(fname,db,process_num=0): #will enable multiprocessing
     
     # get start time 
     t_start = datetime.now()
-    plog("Processing file: {}".format(fname))
+    plog("Processing: {}".format(base_name))
 
+    url, fname = fd.expand_names(base_name)
     
+    # try download the file
+    plog("Downloading {}".format(url))
+
+    try : 
+        fd.download_file(base_name)
+        assert(u.check_for_file(fname))
+    except Exception as e :
+        # we were unable to get the file
+        # in this case we should
+        # report the error then just return
+        plog("There was an error downloading: {}".format(e))
+        db.errors.insert_one({"base_name" : base_name, 't' : datetime.now() , 'error' : str(e), 'type' : 'download'})
+        plog("Wrote to db and skipping for now")
+        return 
+        
     # parse file
-    # TODO add logic for checking if there is a parsing error in the xml!
-    # then after this can test simultaneous download and upload -- will be interesting
-    # in fact could even simulate a half downloaded file ? 
+    try :
+        parsed = xmlp.parse_xml_file(fname)        
+    except Exception as e :
+        # we were unable to parse the file
+        # in this case we should
+        # report the error then just return
+        plog("There was an error parsing: {}".format(e))
+        db.errors.insert_one({"base_name" : base_name, 't' : datetime.now() , 'error' : str(e), "type" : 'parse'})
+        plog("Wrote to db and skipping for now")
+        return 
     
-    parsed = xmlp.parse_xml_file(fname)
+    
     # get those with mesh terms 
     have_mesh = [x for x in parsed if x['mesh_terms'] != None]
 
@@ -45,9 +68,8 @@ def export_file_to_db(fname,db,process_num=0): #will enable multiprocessing
 
     # prepare the pmid items to insert
     # the transform done here is counting the number of mesh terms
-    # AND referencing the fname it came from for debugging purpose
-    pmid_to_insert = [ dict(x,mesh_num=len(x['mesh_terms']),fname=fname) for x in have_mesh ] 
-
+    # AND referencing the base_name it came from for debugging purpose
+    pmid_to_insert = [ dict(x,mesh_num=len(x['mesh_terms']),base_name=base_name) for x in have_mesh ] 
 
     # and we write stuff now, catching any write errors
     error, error_msg = False, "" 
@@ -73,13 +95,14 @@ def export_file_to_db(fname,db,process_num=0): #will enable multiprocessing
     except BulkWriteError as bwe:
         plog("\n\nError with write :( -> {}".format(bwe.details))
         error, error_msg = True, bwe.details
-        db.errors.insert_one({"fname" : fname, 't' : datetime.now() , 'error' : error_msg})        
-    except Exception as e:
-        plog("\n\nUnkown error with write --> for {}".format(fname))
+        db.errors.insert_one({"base_name" : base_name, 't' : datetime.now() , 'error' : error_msg})
+        
+    except Exception as e :
+        plog("\n\nUnkown error with write --> for {}".format(base_name))
         plog("Storing in db")         
         error, error_msg = True, str(e) 
         plog(error_msg)
-        db.errors.insert_one({"fname" : fname, 't' : datetime.now() , 'error' : error_msg})
+        db.errors.insert_one({"base_name" : base_name, 't' : datetime.now() , 'error' : error_msg})
 
     t_end = datetime.now()
 
@@ -99,8 +122,9 @@ def export_file_to_db(fname,db,process_num=0): #will enable multiprocessing
         't_start' : t_start, 
         't_end' : t_end ,
         'seconds_elapsed' : (t_end - t_start).total_seconds() , 
-        'fname' : fname,
+        'base_name' : base_name,
     }
+    
     plog("Success={} | {} articles parsed, {}({}) have mesh and {} written. Mesh total written={}".format(not error,N,hm,fm,pmids_written,mesh_written))
 
     # save the info object as a log 
@@ -109,17 +133,12 @@ def export_file_to_db(fname,db,process_num=0): #will enable multiprocessing
 
     # and finally if there was no error and we finished we will update the "processed" collection
     if not error :
-        db['processed'].insert_one({'fname' :fname})
-        plog("No errors so updated progress collection with fname")
+        db['processed'].insert_one({'base_name' :base_name})
+        plog("No errors so updated progress collection with base_name")
 
-    plog("Finished with file: {}".format(fname))        
-    
-    
-    
-    
-    
+    plog("Finished with file: {}".format(base_name))        
     
     
 def already_processed(db) :
     ap = list(db.processed.find({}))
-    return [ x['fname'] for x in ap ] 
+    return [ x['base_name'] for x in ap ] 

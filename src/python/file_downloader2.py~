@@ -1,0 +1,27 @@
+import util as u 
+import os
+import sys
+import 
+
+log = u.register("file_downloader")
+
+base_url = "https://ftp.ncbi.nlm.nih.gov/pubmed/baseline/"
+compressed_dir = os.path.join(os.getcwd(),"../../data/compressed/")
+
+def all_files() : 
+    log.i("Generating files") 
+    start = 1 
+    end   = 1062 
+    return [ get_file_name(x) for x in range(start,end + 1 ) ] 
+    
+def get_file_name(n) : 
+    num_str = "{:04d}".format(n)
+    return base_url + "pubmed21n{}.xml.gz".format(num_str)
+
+## mehh - im changing the architecture here
+def download_file(url,fname) :
+    r = requests.get(url,stream=True)
+    if r.status_code == 200:
+        with open(fname, 'wb') as f:
+            shutil.copyfileobj(r.raw,f)
+    

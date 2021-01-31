@@ -3,7 +3,8 @@ import util as u
 import xml_to_mongo_db as db
 import xml_parser as xmlp 
 import multiprocessing
-import math 
+import math
+import file_downloader as fd
 
 log = u.register("multi_xml_to_db")
 
@@ -54,8 +55,10 @@ def export_files_to_db_parallel(tmp_fnames,ncpus=default_cpus) :
     
 
 def export_all_xmls_to_db_parallel(ncpus=default_cpus) :
-    export_files_to_db_parallel(xmlp.xml_files,ncpus)
-    
+    export_files_to_db_parallel(fd.base_names,ncpus)
+
+def export_n_xmls_to_db_parallel(n,ncpus=default_cpus) :
+    export_files_to_db_parallel(fd.base_names[0:n],ncpus)
     
     
                                 
