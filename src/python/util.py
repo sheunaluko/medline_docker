@@ -132,3 +132,17 @@ def find_duplicates(coll) :
 def partition(coll, group_size)  :
     return [coll[i:i+group_size] for i in range(0,len(coll),group_size) ]
 
+def partition_in_order(coll, gs) :
+    """will assign each succesive item in coll to a new partition"""
+    parts = []
+    for i in range(gs) :
+        parts.append(coll[i::gs])
+    return parts 
+        
+
+
+
+
+    
+
+

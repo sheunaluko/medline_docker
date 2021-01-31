@@ -5,6 +5,7 @@ import xml_parser as xmlp
 from datetime import datetime
 import pymongo
 from pymongo.errors import BulkWriteError 
+import file_downloader as fd
 
 log = u.register("xml_to_mongo_db") 
 
@@ -28,25 +29,28 @@ def export_file_to_db(base_name,db,process_num=0): #will enable multiprocessing
     
     # get start time 
     t_start = datetime.now()
-    plog("Processing: {}".format(base_name))
+
 
     url, fname = fd.expand_names(base_name)
-    
-    # try download the file
-    plog("Downloading {}".format(url))
 
-    try : 
-        fd.download_file(base_name)
-        assert(u.check_for_file(fname))
-    except Exception as e :
-        # we were unable to get the file
-        # in this case we should
-        # report the error then just return
-        plog("There was an error downloading: {}".format(e))
-        db.errors.insert_one({"base_name" : base_name, 't' : datetime.now() , 'error' : str(e), 'type' : 'download'})
-        plog("Wrote to db and skipping for now")
-        return 
-        
+    if (u.check_for_file(fname)) :
+        plog("File already downloaded...")
+    else : 
+        # try download the file
+        plog("Downloading {}".format(url))
+        try : 
+            fd.download_file(base_name)
+            assert(u.check_for_file(fname))
+        except Exception as e :
+            # we were unable to get the file
+            # in this case we should
+            # report the error then just return
+            plog("There was an error downloading: {}".format(e))
+            db.errors.insert_one({"base_name" : base_name, 't' : datetime.now() , 'error' : str(e), 'type' : 'download'})
+            plog("Wrote to db and skipping for now")
+            return 
+
+    plog("Processing: {}".format(base_name))        
     # parse file
     try :
         parsed = xmlp.parse_xml_file(fname)        

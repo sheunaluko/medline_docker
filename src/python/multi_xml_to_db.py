@@ -42,8 +42,9 @@ def export_files_to_db_parallel(tmp_fnames,ncpus=default_cpus) :
         log.i("Nothing to export... exiting.")
         return 
     
-    partition_sz    = math.ceil(len(fnames)/ncpus)
-    file_partitions = u.partition(fnames,partition_sz)
+    # partition_sz    = math.ceil(len(fnames)/ncpus) # old way 
+    # file_partitions = u.partition(fnames,partition_sz) # old
+    file_partitions = u.partition_in_order(fnames,ncpus) # new way -- better 
     log.i("Created {} file partitions: {}".format(len(file_partitions), [len(x) for x in file_partitions]))
 
     # build the argument tuples i.e. [ (process_num, files), ... ] 

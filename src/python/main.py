@@ -28,10 +28,6 @@ parser.add_argument('--cpus',
                     default=dbp.default_cpus,
                     help="Number of CPUs to use for parsing and exporting")
 
-parser.add_argument('--download-last',
-                    dest='download_last_n',
-                    type=int, 
-                    help="Download the last N pubmed compressed xml archives directly from the ftp server")
 
 args = parser.parse_args() 
 
