@@ -1,0 +1,1 @@
+docker run --name mongo1 -v /media/oluwa/samsung2tb/mongo/data/db:/data/db -p 27018:27018 -d mongo --port 27018

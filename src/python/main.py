@@ -1,6 +1,8 @@
 # Wed 20 Jan 2021 03:33:05 PM CST
 # Sheun Aluko
 
+# RUN THIS LIKE => python main.py --export-all --cpus 1  in order to limit to 1 cpu and rate limit requests
+
 import util            as u 
 import file_downloader as fd 
 import xml_parser      as xmlp

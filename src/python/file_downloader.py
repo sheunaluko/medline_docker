@@ -1,6 +1,7 @@
 import util as u 
 import os
 import sys
+import subprocess 
 #import requests
 import shutil
 import urllib.request as request
@@ -43,5 +44,5 @@ def expand_names(bn) :
 
 def download_file(base) :
     url ,fname = expand_names(base) 
-    os.system("curl -s {} --output {}".format(url,fname))
+    return u.shell_output(["curl", url, "--output" , fname ])
 

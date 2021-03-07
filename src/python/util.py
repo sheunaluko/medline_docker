@@ -9,6 +9,7 @@ import datetime
 import logging
 from functools import reduce
 import operator
+import subprocess
 
 #reloading stuff 
 reload_children = set(["util"] ) 
@@ -93,6 +94,36 @@ def append_file(fname, strang) :
     with open(fname, mode) as outfile : 
         outfile.write(strang)
 
+        # sub commands 
+def sub_cmd(cmd,mode) : 
+    import subprocess
+    import sys
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    to_return = "" 
+    if mode == "q" : 
+        #do nothing 
+        pass 
+    else : 
+        for c in iter(lambda: process.stdout.read(1), b''): 
+            ch = c.decode()
+            to_return += ch 
+            if mode == "v" : 
+                sys.stdout.write(ch)
+    if mode == "s" : 
+        return to_return 
+
+def sub_cmd_v(cmd) : 
+    return sub_cmd(cmd,"v")
+
+def sub_cmd_q(cmd) : 
+    return sub_cmd(cmd,"q")
+
+def sub_cmd_s(cmd) : 
+    return sub_cmd(cmd,"s")
+
+
+def shell_output(cmd) :
+    return subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE).communicate()
 
 def contains(a1,a2) :  
     return bool(re.search(a2, a1))

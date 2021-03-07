@@ -20,6 +20,12 @@ def export_files_to_db(process_num,fnames) :
     meshdb,dbclient = db.get_db_client() # get the db handle here
     # note this will be running in its own process
     # so we will loop through the assigned files and process them in series
+    # also note -- there is a delay parameter set inside the export_file_to_db function
+    # which helps to rate limit network requests - can do more work to figure this out
+    # problem: with 7 processes going the network ftp requests failed after sometime
+    # solution: initially implemented delay but than set delay=0 and only ran one cpu process at a time
+    # future solution: compress the downloaded archive into a docker container for distribution
+    # -- allow multiprocess extraction of the archive and dump into db 
     for fname in fnames :
         db.export_file_to_db(fname,meshdb,process_num)
 

@@ -1,0 +1,2 @@
+stop_docker_mongo
+docker run --name mongo1 -v /mnt/samsung2tb/mongo/data/db:/data/db -p 27018:27018 -d mongo --port 27018
