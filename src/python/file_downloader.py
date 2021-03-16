@@ -11,6 +11,7 @@ log = u.register("file_downloader")
 
 base_url = "https://ftp.ncbi.nlm.nih.gov/pubmed/baseline/"
 compressed_dir = os.path.join(os.getcwd(),"../../data/compressed/")
+md5_dir = os.path.join(os.getcwd(),"../../data/md5/")
 
 def get_file_base_name(n) : 
     num_str = "{:04d}".format(n)
@@ -32,6 +33,7 @@ def fname_from_base_name(n) :
 
 def expand_names(bn) :
     return url_from_base_name(bn) , fname_from_base_name(bn) 
+
     
 
 ## mehh - im changing the architecture here
@@ -45,4 +47,8 @@ def expand_names(bn) :
 def download_file(base) :
     url ,fname = expand_names(base) 
     return u.shell_output(["curl", url, "--output" , fname ])
+
+def download_md5(base) :
+    pass
+    return u.shell_output(["curl", url, "--output" , md5_name ])
 

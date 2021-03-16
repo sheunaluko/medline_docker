@@ -1,1 +1,66 @@
+## -- 
+Extract the MESHIDs on which to do cooccurence analysis! 
+
+Extract all symptoms by MESH query: C23  
+Extract all diseases by MESH query: C [and exclude C23] 
+Because Risk factors can literally be anything -- will instead query them from wikidata and get those with Mesh IDs 
+
+THEN!!! 
+I will have a bank of (symptoms + risk factors) meshids 
+to calculate association metrics with (Disease) meshids 
+
+* automat the extraction of all IDs 
+
+
+
+TODO -- 
+
+-- [ ] retrieve MESH ids and write to disk 
+-- [ ] start analysis pipeline 
+-- [ ] start stats hw 
+
+
+
+DONE 
+-- [x] wikidata query for getting all risk factors with MeshIDs
+cds query for retrieving ALL relevant MeshIDs (split by disease/ symptom) 
+hyperloop endpoint for saving json to disk
+-- [x] get baking stuff for cookies / banana bread (batteries) 
+-- will need to do "--allow-write" 
+
+
+
+
+
+
+
+
 dont forget about alternate versions! / multiple citations -- check version #? 
+
+
+4571 ! 
+
+
+__ NOTES-__ 
+
+
+
+
+1. Should probably store the base_name metadata into the meshid document as well and index on it 
+This maintains the provenance for each document, both in pmid and meshid. That way I can have 
+utilities such as: 
+	  undo_file_export(base_name) : 
+	  """ Retrieves and removes all documents in pmid and meshid from 'base_name' """ 
+	  
+
+2. Should have a separate parallelized downloader which retrieves the compressed archives AND the 
+checksums, validates them (and repairs any errors) 
+	   - last step is to package the archives into docker container 
+	   - will figure out the best distribution strategy later ... 
+	      
+	   
+!! 3. When extracting and dumping into mongo -- should PARSE the date field  !! 
+	  
+	  			      
+!! 4. use $push operator to populate the database instead -- will allow for faster retrieval of 
+all documents :) 

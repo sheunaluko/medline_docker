@@ -1,0 +1,19 @@
+
+
+
+1. Should probably store the base_name metadata into the meshid document as well and index on it 
+This maintains the provenance for each document, both in pmid and meshid. That way I can have 
+utilities such as: 
+	  undo_file_export(base_name) : 
+	  """ Retrieves and removes all documents in pmid and meshid from 'base_name' """ 
+	  
+
+2. Should have a separate parallelized downloader which retrieves the compressed archives AND the 
+checksums, validates them (and repairs any errors) 
+	   - last step is to package the archives into docker container 
+	   - will figure out the best distribution strategy later ... 
+	      
+	   
+!! 3. When extracting and dumping into mongo -- should PARSE the date field  !! 
+	  
+	  			      

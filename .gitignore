@@ -1,1 +1,10 @@
 data/
+src/python/associations/
+src/python/symptom_counts.json
+src/python/disease_counts.json
+src/python/symptom_data/
+src/python/disease_data/
+src/python/intersections
+src/python/__pycache__
+src/python/scratch 
+src/python/sdata.json

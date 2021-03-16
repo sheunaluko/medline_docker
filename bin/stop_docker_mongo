@@ -1,3 +1,0 @@
-docker stop mongo1
-docker rm mongo1
-echo done 
